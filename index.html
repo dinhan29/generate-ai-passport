@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ôn tập kiến thức AI với flashcard tiếng Nhật và tiếng Việt.">
+    <title>Flashcards — AI Passport</title>
+    <link rel="icon" href="data:,">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script defer src="datas/sections.js"></script>
+    <script defer src="js/app.js"></script>
+  </head>
+  <body class="min-h-screen bg-white font-[Arial,'Noto_Sans_JP',Meiryo,sans-serif] text-slate-800 antialiased">
+    <main class="mx-auto flex h-svh w-full max-w-[84rem] flex-col px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] sm:h-auto sm:px-10 sm:pt-16 sm:pb-8 lg:pt-24" aria-label="Ôn tập flashcard">
+      <div class="mb-4 flex shrink-0 items-center justify-between gap-4 sm:mb-8">
+        <div class="group relative max-w-[75%]">
+          <label class="sr-only" for="section-select">Chọn section</label>
+          <i data-lucide="layers-2" aria-hidden="true" class="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-slate-400 transition-colors group-hover:text-slate-600"></i>
+          <select id="section-select" class="min-h-12 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50/70 py-3 pr-12 pl-11 text-sm font-medium text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-100 focus:border-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-slate-100 motion-reduce:transition-none sm:min-w-56 sm:text-base"></select>
+          <i data-lucide="chevron-down" aria-hidden="true" class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-slate-400"></i>
+        </div>
+        <span id="progress" class="shrink-0 text-sm font-medium tracking-wide text-slate-400 tabular-nums sm:text-base" aria-label="Tiến độ"></span>
+      </div>
+
+      <section id="card-shell" data-side="front" class="group relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white data-[side=back]:border-emerald-200 data-[side=back]:bg-emerald-50 data-[side=back]:text-emerald-950 shadow-[0_8px_40px_-20px_rgba(15,23,42,0.15)] transition-[background-color,border-color,box-shadow,color] duration-300 hover:shadow-[0_12px_48px_-20px_rgba(15,23,42,0.2)] motion-reduce:transition-none sm:min-h-[26rem] sm:flex-initial lg:min-h-[34rem]" aria-label="Flashcard">
+        <div class="relative inset-x-0 top-0 z-10 flex shrink-0 items-center justify-between gap-3 px-4 pt-4 sm:absolute sm:px-8 sm:pt-7">
+          <div class="flex items-center gap-3">
+            <span class="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-400 transition-colors duration-300 group-data-[side=back]:bg-emerald-100 group-data-[side=back]:text-emerald-700 motion-reduce:transition-none" aria-hidden="true">
+              <i data-lucide="message-circle-question" class="size-4 group-data-[side=back]:hidden"></i>
+              <i data-lucide="check" class="hidden size-4 group-data-[side=back]:block"></i>
+            </span>
+            <span id="card-id" class="text-sm font-medium tracking-wide text-slate-400 tabular-nums group-data-[side=back]:text-emerald-600 sm:text-base"></span>
+          </div>
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center rounded-xl bg-slate-100/80 p-1 text-xs font-medium" role="group" aria-label="Ngôn ngữ thẻ">
+              <button id="language-ja" type="button" class="min-h-9 min-w-11 cursor-pointer rounded-lg px-3 transition duration-200 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-sm aria-[pressed=false]:text-slate-400 motion-reduce:transition-none" aria-pressed="true">JP</button>
+              <button id="language-vi" type="button" class="min-h-9 min-w-11 cursor-pointer rounded-lg px-3 transition duration-200 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-sm aria-[pressed=false]:text-slate-400 motion-reduce:transition-none" aria-pressed="false">VN</button>
+            </div>
+            <button id="explanation-toggle" type="button" class="flex size-11 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition duration-200 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 aria-expanded:bg-slate-100 aria-expanded:text-slate-800 motion-reduce:transition-none" aria-label="Xem giải thích" aria-expanded="false" aria-controls="explanation-panel" aria-haspopup="dialog" title="Xem giải thích">
+              <i data-lucide="circle-help" aria-hidden="true" class="size-5"></i>
+            </button>
+          </div>
+        </div>
+        <button id="flashcard" type="button" aria-keyshortcuts="Space" class="flex min-h-0 w-full flex-1 cursor-pointer flex-col items-center overflow-y-auto overscroll-contain px-5 py-6 text-center sm:flex-row sm:justify-center focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-slate-400 sm:min-h-[26rem] sm:px-14 sm:pt-24 sm:pb-16 lg:min-h-[34rem] lg:px-24" aria-label="Lật thẻ để xem đáp án">
+          <span id="card-content" lang="ja" class="my-auto block max-w-full shrink-0 text-2xl leading-relaxed font-normal break-words sm:text-3xl sm:leading-relaxed lg:max-w-[60rem] lg:text-5xl lg:leading-relaxed"></span>
+        </button>
+      </section>
+
+      <div class="mt-4 flex shrink-0 items-center justify-center gap-2 sm:mt-8 sm:gap-4 lg:mt-10" aria-label="Điều hướng thẻ">
+        <button id="previous-card" type="button" aria-keyshortcuts="ArrowLeft" title="Thẻ trước (←)" class="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-500 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-400 disabled:cursor-default disabled:opacity-30 disabled:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none sm:min-w-32 sm:px-5">
+          <i data-lucide="arrow-left" aria-hidden="true" class="size-4 transition-transform duration-200 group-enabled:group-hover:-translate-x-0.5 motion-reduce:transition-none"></i><span>Trước</span>
+        </button>
+        <button id="flip-card" type="button" aria-keyshortcuts="Space" title="Lật thẻ (Space)" class="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-800 px-4 py-3 text-sm font-medium text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-slate-700 aria-pressed:border-emerald-700 aria-pressed:bg-emerald-700 aria-pressed:hover:bg-emerald-600 hover:shadow-md active:translate-y-0 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-400 motion-reduce:transform-none motion-reduce:transition-none sm:min-w-40 sm:px-7" aria-pressed="false">
+          <i data-lucide="rotate-3d" aria-hidden="true" class="size-4 transition-transform duration-300 group-hover:rotate-12 motion-reduce:transition-none"></i><span>Lật thẻ</span>
+        </button>
+        <button id="next-card" type="button" aria-keyshortcuts="ArrowRight" title="Thẻ tiếp (→)" class="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-medium text-slate-500 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-400 disabled:cursor-default disabled:opacity-30 disabled:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none sm:min-w-32 sm:px-5">
+          <span>Tiếp</span><i data-lucide="arrow-right" aria-hidden="true" class="size-4 transition-transform duration-200 group-enabled:group-hover:translate-x-0.5 motion-reduce:transition-none"></i>
+        </button>
+      </div>
+      <div class="mt-3 flex shrink-0 flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-400 sm:mt-5" aria-label="Hướng dẫn thao tác">
+        <span class="inline-flex items-center gap-1.5">
+          <span>Lật thẻ:</span>
+          <i data-lucide="hand" aria-hidden="true" class="size-3.5 sm:hidden"></i>
+          <span class="sm:hidden">chạm</span>
+          <span class="hidden sm:inline">nhấp hoặc</span>
+          <kbd class="hidden rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-sans text-[11px] text-slate-500 shadow-xs sm:inline">Space</kbd>
+        </span>
+        <span class="hidden items-center gap-1.5 sm:inline-flex">
+          <span>Chuyển thẻ:</span>
+          <kbd class="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-sans text-[11px] text-slate-500 shadow-xs">←</kbd>
+          <kbd class="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 font-sans text-[11px] text-slate-500 shadow-xs">→</kbd>
+        </span>
+      </div>
+
+      <dialog id="explanation-panel" class="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 bg-transparent p-0 text-slate-800 px-4 py-6 backdrop:bg-slate-950/25 backdrop:backdrop-blur-[2px] open:flex open:items-center open:justify-center sm:p-8" aria-labelledby="explanation-title">
+        <div id="explanation-popup" class="flex max-h-[calc(100dvh-3rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-2xl sm:max-h-[80dvh]">
+          <header class="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-6 sm:py-4">
+            <h2 id="explanation-title" tabindex="-1" class="flex min-w-0 items-center gap-1.5 text-xs font-medium text-slate-500 outline-none sm:gap-2 sm:text-sm">
+              <span class="sr-only">Giải thích: </span>
+              <i data-lucide="lightbulb" aria-hidden="true" class="size-4 shrink-0 text-slate-400"></i>
+              <span id="explanation-context" class="truncate"></span>
+              <span id="explanation-card-id" class="shrink-0 text-slate-400 tabular-nums"></span>
+            </h2>
+            <div class="flex shrink-0 items-center gap-1 sm:gap-3">
+              <div class="inline-flex rounded-xl bg-slate-100/80 p-1 text-xs font-medium" role="group" aria-label="Ngôn ngữ giải thích">
+                <button id="explanation-language-ja" type="button" class="min-h-9 min-w-10 cursor-pointer rounded-lg px-2 transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-sm aria-[pressed=false]:text-slate-400 motion-reduce:transition-none sm:min-w-11" aria-pressed="true">JP</button>
+                <button id="explanation-language-vi" type="button" class="min-h-9 min-w-10 cursor-pointer rounded-lg px-2 transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 aria-pressed:bg-white aria-pressed:text-slate-900 aria-pressed:shadow-sm aria-[pressed=false]:text-slate-400 motion-reduce:transition-none sm:min-w-11" aria-pressed="false">VN</button>
+              </div>
+              <button id="explanation-close" type="button" class="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition duration-200 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 motion-reduce:transition-none" aria-label="Đóng giải thích"><i data-lucide="x" aria-hidden="true" class="size-5"></i></button>
+            </div>
+          </header>
+          <div id="explanation-scroll" tabindex="0" role="region" aria-label="Nội dung giải thích" class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-5 pb-6 [scrollbar-gutter:stable] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-slate-300 sm:px-7 sm:pt-6">
+            <p id="explanation-content" class="text-base leading-loose break-words whitespace-pre-wrap text-slate-600"></p>
+          </div>
+        </div>
+      </dialog>
+      <p id="card-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <noscript><p class="mt-6 text-center">Vui lòng bật JavaScript để sử dụng flashcard.</p></noscript>
+    </main>
+  </body>
+</html>
